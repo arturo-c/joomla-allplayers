@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="component" version="2.5.0">
+	<name>allplayers_auth</name>
+	<author>Zach Curtis - Wayin Inc</author>
+	<authorEmail>zc@wayin.com</authorEmail>
+	<authorUrl>http://www.wayin.com</authorUrl>
+	<creationDate>October, 2012</creationDate>
+	<copyright>Copyright (C) 2012 Wayin.com - All rights reserved.</copyright>
+	<version>1.0</version>
+	<license>GNU / GPL</license>
+	<description><![CDATA[All-Players Auth is a component for All-Players oauth and joomla integration]]></description>
+	<files folder="site">
+		<filename>index.html</filename>
+		<filename>allplayers_auth.php</filename>
+		<filename>controller.php</filename>
+		<filename>helper.php</filename>
+		<filename>twitter-signin.png</filename>
+		<folder>views</folder>
+		<folder>twitter-async</folder>
+	</files>
+  <install>
+    <!--    <sql>
+          <file charset="utf8" driver="mysql">install.sql</file>
+          <file driver="mysql">install.sql</file>
+      </sql> -->
+  </install>
+  <uninstall>
+   <!--    <sql>
+          <file charset="utf8" driver="mysql">uninstall.sql</file>
+          <file driver="mysql">uninstall.sql</file>
+      </sql> -->
+  </uninstall>
+	<administration>
+		<menu>Allplayers Auth</menu>
+		<files folder="admin">
+			<filename>index.html</filename>
+			<filename>allplayers_auth.php</filename>
+			<filename>controller.php</filename>
+<!--       <filename>install.sql</filename>
+      <filename>uninstall.sql</filename> -->
+			<folder>views</folder>
+		</files>
+	</administration>
+</install>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install version="2.5" type="plugin" group="authentication">
-	<name>plg_authentication_allplayers</name>
+	<name>Authentication - All-Players Oauth</name>
 	<author>Zach Curtis, Wayin, Inc</author>
 	<creationDate>October 2012</creationDate>
 	<copyright>Copyright (C) 2012 Open Source Matters. All rights reserved.</copyright>
@@ -16,8 +16,7 @@
 		<folder>assets</folder>
 	</files>
 	<languages folder="lang">
-		<language tag="en-GB">en-GB.plg_authentication_allplayers.ini</language>
-		<language tag="en-GB">en-GB.plg_authentication_allplayers.sys.ini</language>
+		<language tag="en-GB">en-GB.plg_allplayers_authentication.ini</language>
 	</languages>
 	<config>
 		<fields name="params">

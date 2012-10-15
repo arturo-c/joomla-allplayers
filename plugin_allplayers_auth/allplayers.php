@@ -4,6 +4,7 @@
  * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
  * @license		GNU General Public License version 2 or later; see LICENSE.txt
  * Written by Zach Curtis, Wayin Inc 2012
+ * Libs provided by All-Players
  */
 
 // No direct access
@@ -20,11 +21,6 @@ require_once __DIR__.'/vendor/autoload.php';
 jimport( 'joomla.environment.uri' );
 jimport( 'joomla.plugin.plugin' );
 
-// $app->register(new Silex\Provider\TwigServiceProvider(), array(
-//     'twig.path' => __DIR__.'/views',
-// ));
-
-
 
 /**
  * All-Players Authentication Plugin
@@ -40,7 +36,14 @@ class plgAuthenticationAllPlayers extends JPlugin {
 		parent::__construct($subject, $config);
 	}
        
-    
+    function onAfterDispatch() {
+    	global $LoginModule;
+        $app =& JFactory::getApplication();
+        if ( $app->getName() != 'site' ) return true;   
+        if ( $app->getCfg('offline') ) return true;		
+        $document =& JFactory::getDocument();
+        if ( $document->getType() != 'html' ) return true; 
+    }
 	/**
 	 * This method should handle any authentication and report back to the subject
 	 *
