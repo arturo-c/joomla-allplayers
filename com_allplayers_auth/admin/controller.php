@@ -1,11 +1,11 @@
 <?php
 /**
  * @version	0.1
- * @package	twitter
- * @author Mobilada.com
-nfo@mobilada.com/g
- * @author mail	info@mobilada.com
- * @copyright	Copyright (C) 2009 Mobilada.com - All rights reserved.
+ * @package	allplayers_auth
+ * @author Zach Curtis, Wayin Inc
+*
+ * @author mail	info@wayin.com
+ * @copyright	Copyright (C) 2012 Wayin.com - All rights reserved.
  * @license		GNU/GPL
  */
  

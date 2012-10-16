@@ -21,7 +21,6 @@ require_once __DIR__.'/vendor/autoload.php';
 jimport( 'joomla.environment.uri' );
 jimport( 'joomla.plugin.plugin' );
 
-
 /**
  * All-Players Authentication Plugin
  *
@@ -31,7 +30,7 @@ jimport( 'joomla.plugin.plugin' );
  */
 class plgAuthenticationAllPlayers extends JPlugin {
 	private $_app;
-	//private $_p = 'a';
+
 	function plgAuthenticationAllPlayers(&$subject, $config = array()){
 		parent::__construct($subject, $config);
 	}

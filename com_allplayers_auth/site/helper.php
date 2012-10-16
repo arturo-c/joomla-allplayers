@@ -2,26 +2,30 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-include(JPATH_BASE . "/components/com_twitter/twitter-async/EpiCurl.php");
-include(JPATH_BASE . "/components/com_twitter/twitter-async/EpiOAuth.php");
-include(JPATH_BASE . "/components/com_twitter/twitter-async/EpiTwitter.php");
+use Symfony\Component\HttpFoundation\Response;
+use Guzzle\Http\Client;
+use Guzzle\Http\Plugin\OauthPlugin;
+use AllPlayers\AllPlayersClient;
 
-class ComTwitterHelper {
+require_once (JPATH_COMPONENT.DS.'vendor/autoload.php');
+
+class ComAllPlayersHelper {
   
   private $consumer;
   private $token;
 
   function __construct() {
     $this->db = JFactory::getDBO();
-    $this->db->setQuery('select * from #__twitter_consumer');
+    $this->db->setQuery('select * from #__allplayers_auth');
     $consumer = $this->db->loadObject();
-    if (!$consumer) throw new Exception('ComTwitterNotInstalledOrConfigured');
+    if (!$consumer) throw new Exception('ComAllPlayersAuthNotInstalledOrConfigured');
     $this->consumer = $consumer;
+    $this->session = JFactory::getSession();
   }
 
   function getJoomlaUserMapping($id) {
     $this->db->setQuery(
-      sprintf('select * from #__twitter_mapping where userid="%s"', 
+      sprintf('select * from #__allplayers_auth_mapping where userid="%s"', 
         $this->db->getEscaped($id)
       )
     );
@@ -32,7 +36,7 @@ class ComTwitterHelper {
   function getUserMapping() {
     $twitterInfo = $this->getCredentials();
     $this->db->setQuery(
-      sprintf('select * from #__twitter_mapping where twitterid="%s"', 
+      sprintf('select * from #__allplayers_auth_mapping where twitterid="%s"', 
         $this->db->getEscaped($twitterInfo->id)
       )
     );
@@ -43,17 +47,17 @@ class ComTwitterHelper {
   function setUserMapping() {
     $twitterInfo = $this->getCredentials();
     $twitter_userid = $twitterInfo->id;
-		$user = JFactory::getUser();	
-    return $this->db->execute(sprintf("insert into #__twitter_mapping values(DEFAULT, '%s', '%s')", $twitter_userid, $user->id));
+    $user = JFactory::getUser();  
+    return $this->db->execute(sprintf("insert into #__allplayers_auth_mapping values(DEFAULT, '%s', '%s')", $twitter_userid, $user->id));
   }
 
   function getCredentials() {
-    if ( isset($_SESSION['com_twitter_credentials']) && 
-          $_SESSION['com_twitter_credentials']->oauth_token == $_COOKIE['oauth_token'] &&
-          $_SESSION['com_twitter_credentials']->oauth_token_secret == $_COOKIE['oauth_token_secret'] &&
-          $_SESSION['com_twitter_credentials']->twitterInfo->timeout > time()
+    if ( isset($_SESSION['com_allplayers_credentials']) && 
+          $_SESSION['com_allplayers_credentials']->oauth_token == $_COOKIE['oauth_token'] &&
+          $_SESSION['com_allplayers_credentials']->oauth_token_secret == $_COOKIE['oauth_token_secret'] &&
+          $_SESSION['com_allplayers_credentials']->twitterInfo->timeout > time()
     ) {
-      $twitterInfo = $_SESSION['com_twitter_credentials']->twitterInfo;
+      $twitterInfo = $_SESSION['com_allplayers_credentials']->twitterInfo;
     } else {
       try {
         $twitterInfo = null;
@@ -78,7 +82,7 @@ class ComTwitterHelper {
         $twitter_credentials->oauth_token = $this->token->oauth_token;
         $twitter_credentials->oauth_token_secret = $this->token->oauth_token_secret;
 
-        $_SESSION['com_twitter_credentials'] = $twitter_credentials;
+        $_SESSION['com_allplayers_credentials'] = $twitter_credentials;
         $twitterInfo = $ti;
       } catch(Exception $e){
         throw $e;
@@ -106,17 +110,65 @@ class ComTwitterHelper {
     return $twitterObj->getAuthenticateUrl();
   }
 
-  function doLogin() {
-    $twitterObj = new EpiTwitter($this->consumer->key, $this->consumer->secret);
-    $twitterObj->setToken($_GET['oauth_token']);
-    $token = $twitterObj->getAccessToken();
-    $twitterObj->setToken($token->oauth_token, $token->oauth_token_secret);
+  function doLogin($consumer, $oauth_token, $secret) {
+    $client = new Client($consumer->oauthurl . '/oauth', array(
+        'curl.CURLOPT_SSL_VERIFYPEER' => isset($consumer->verifypeer) ? $consumer->verifypeer : TRUE,
+        'curl.CURLOPT_CAINFO' => 'assets/mozilla.pem',
+        'curl.CURLOPT_FOLLOWLOCATION' => FALSE
+      ));
 
-    // save to cookies
-    setcookie('oauth_token', $token->oauth_token, 0, '/' );
-    setcookie('oauth_token_secret', $token->oauth_token_secret, 0, '/');
-    $this->token = $token;
-    return $this->getCredentials();
+    $oauth = new OauthPlugin(array(
+        'consumer_key' => $consumer->key,
+        'consumer_secret' => $consumer->secret,
+        'token' => $oauth_token,
+        'token_secret' => $secret
+    ));
+
+    $client->addSubscriber($oauth);
+
+    $response = $client->get('access_token')->send();
+
+    $oauth_tokens = array();
+    parse_str($response->getBody(TRUE), $oauth_tokens);
+    $this->session->set('auth_token', $oauth_tokens['oauth_token']);
+    $this->session->set('auth_secret', $oauth_tokens['oauth_token_secret']);
+    $token = $oauth_tokens['oauth_token'];
+    $secret = $oauth_tokens['oauth_token_secret'];
+
+    if (!empty($token) && !empty($secret)) {
+      $client = AllPlayersClient::factory(array(
+          'auth' => 'oauth',
+          'oauth' => array(
+            'consumer_key' => $this->session->get('consumer_key'),
+            'consumer_secret' => $this->session->get('consumer_secret'),
+            'token' => $token,
+            'token_secret' => $secret
+          ),
+          'host' => parse_url($this->consumer->oauthurl, PHP_URL_HOST),
+          'curl.CURLOPT_SSL_VERIFYPEER' => isset($this->consumer->verifypeer) ? $this->consumer->verifypeer : TRUE,
+          'curl.CURLOPT_CAINFO' => __DIR__.'assets/mozilla.pem',
+          'curl.CURLOPT_FOLLOWLOCATION' => FALSE
+        )
+      );
+      $response = $client->get('users/current.json')->send();
+      // Note: getLocation returns full URL info, but seems to work as a request in Guzzle
+      $response = $client->get($response->getLocation())->send();
+      $user = json_decode($response->getBody(TRUE));
+      $this->session->set('user_uuid', $user->uuid);
+
+      return $user;
+    }
+    // $twitterObj = new EpiTwitter($this->consumer->key, $this->consumer->secret);
+    // $twitterObj->setToken($_GET['oauth_token']);
+    // $token = $twitterObj->getAccessToken();
+    // $twitterObj->setToken($token->oauth_token, $token->oauth_token_secret);
+
+    // // save to cookies
+    // setcookie('oauth_token', $token->oauth_token, 0, '/' );
+    // setcookie('oauth_token_secret', $token->oauth_token_secret, 0, '/');
+    // $this->token = $token;
+    //return $this->getCredentials();
   }
+
 }
 ?>

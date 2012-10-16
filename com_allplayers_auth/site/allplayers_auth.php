@@ -1,34 +1,25 @@
 <?php
 /**
- * @version	0.1
- * @package	twitter
- * @author Mobilada.com
- * @author mail	info@mobilada.com
- * @copyright	Copyright (C) 2009 Mobilada.com - All rights reserved.
+ * @version	1.0
+ * @package	allplayers_auth
+ * @author Zach Curtis, Wayin Inc
+ * @author mail	info@wayin.com
+ * @copyright	Copyright (C) 2012 Wayin.com - All rights reserved.
  * @license		GNU/GPL
  */
  
-// no direct access
+// No direct access to this file
 defined('_JEXEC') or die('Restricted access');
  
-// Require the base controller
-require_once (JPATH_COMPONENT.DS.'controller.php');
-
-// Require specific controller if requested
-if($controller = JRequest::getVar('controller')) 
-{
-	$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
-	if ( file_exists( $path ) ) {
-		require_once( $path );
-	} else {
-		$controller = '';
-	}
-}
-
-// Create the controller
-$classname	= 'twitterController' . ucfirst($controller);
-$controller = new $classname();
-
+// import joomla controller library
+jimport('joomla.application.component.controller');
+ 
+// Get an instance of the controller prefixed by AllPlayers
+$controller = JController::getInstance('AllPlayers');
+ 
 // Perform the Request task
-$controller->execute(JRequest::getVar('task', null, 'default', 'cmd'));
+$input = JFactory::getApplication()->input;
+$controller->execute($input->getCmd('task'));
+ 
+// Redirect if set by the controller
 $controller->redirect();

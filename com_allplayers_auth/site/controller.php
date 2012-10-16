@@ -1,10 +1,10 @@
 <?php
 /**
  * @version	0.1
- * @package	twitter
- * @author Mobilada.com
- * @author mail	info@mobilada.com
- * @copyright	Copyright (C) 2009 Mobilada.com - All rights reserved.
+ * @package	allplayers_auth
+ * @author Zach Curtis, Wayin Inc
+ * @author mail	info@wayin.com
+ * @copyright	Copyright (C) 2012 Wayin.com - All rights reserved.
  * @license		GNU/GPL
  */
  
@@ -12,60 +12,66 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('joomla.application.component.controller');
-include_once(JPATH_BASE . "/components/com_twitter/helper.php");
+include_once(JPATH_BASE . "/components/com_allplayers_auth/helper.php");
 
-class twitterController extends JController
-{
+class AllPlayersController extends JController {
 
-	function __construct()
-	{
+	function __construct() {
 		parent::__construct();
-    $this->config = JFactory::getConfig();
-    $this->baseurl = $this->config->getValue('config.live_site');
-    $this->db = JFactory::getDBO();
+        $this->config = JFactory::getConfig();
+        $this->baseurl = $this->config->getValue('config.live_site');
+        $this->db = JFactory::getDBO();
 	}
 	
-	function display($tpl = null)
-	{
+	public function display($tpl = null) {
 		parent::display($tpl);
 	}
 
-  function callback() {
-    global $mainframe;
-    $helper = new ComTwitterHelper();
-    $baseurl = $this->baseurl;
-
-    if ($_GET['oauth_token']) {
-      try {
-        $twitterInfo = $helper->doLogin();
-      } catch (Exception $e) {
-        $je = json_decode($e->getMessage());
-        $this->setRedirect($baseurl, $je->error);
-      }
-      if ($twitterInfo) {
-        if ($mapping = $helper->getUserMapping()) {
-          // log in user  
-          // For login we are using an authentication plugin.
-          // This plugin looks for COM_TWITTER:COM_TWITTER_LOGIN credentials
-          // and  gets $_SESSION['com_twitter'] object for userid
-          $mainframe->login(array('username' => 'COM_TWITTER', 'password' => 'COM_TWITTER_LOGIN'));
-          $mainframe->redirect(JRoute::_('index.php'));
+    public function callback() {
+        global $mainframe;
+        $helper = new ComAllPlayersHelper();
+        $baseurl = $this->baseurl;
+        $session = JFactory::getSession();
+        $this->db->setQuery('SELECT * FROM #__allplayers_auth');
+        $consumer = $this->db->loadObject();
+        // $oauth_token = $session->get('access_token');
+        // JFactory::getApplication()->enqueueMessage( 'Load: '. $oauth_token ); 
+        if ($_GET['oauth_token']) {
+            try {
+                $oauth_token = $session->get('access_token');
+                $secret = $session->get('access_secret');
+                $userInfo = $helper->doLogin($consumer, $oauth_token, $secret);
+             //   $this->setRedirect(JRoute::_('index.php'), 'Hata'.$userInfo);
+                //   JFactory::getApplication()->enqueueMessage( 'User: '. $userInfo );
+                return;
+            } catch (Exception $e) {
+                $je = json_decode($e->getMessage());
+               // $this->setRedirect($baseurl, $je->error);
+            }
+            // if ($userInfo) {
+            //     if ($mapping = $helper->getUserMapping()) {
+            //         // log in user  
+            //         // For login we are using an authentication plugin.
+            //         // This plugin looks for COM_TWITTER:COM_TWITTER_LOGIN credentials
+            //         // and  gets $_SESSION['com_allplayers_auth'] object for userid
+            //         $mainframe->login(array('username' => 'COM_TWITTER', 'password' => 'COM_TWITTER_LOGIN'));
+            //         $mainframe->redirect(JRoute::_('index.php'));
+            //     } else {
+            //     //There is no mapping lets do some mappings!
+            //         $mainframe->redirect(JRoute::_('index.php?option=com_allplayers_auth&view=mapping&task=mapping'));
+            //     }
+            // } 
+        //$this->setRedirect(JRoute::_('index.php'), 'Hata'.$userInfo);
         } else {
-          //There is no mapping lets do some mappings!
-          $mainframe->redirect(JRoute::_('index.php?option=com_twitter&view=mapping&task=mapping'));
+            setcookie('oauth_token', '', 1, '/');
+            setcookie('oauth_token_secret', '', 1, '/');
+          //  $this->setRedirect($baseurl, 'No Auth Token is set.');
         }
-      } 
-      $this->setRedirect(JRoute::_('index.php'), 'Hata');
-    } else {
-      setcookie('oauth_token', '', 1, '/');
-      setcookie('oauth_token_secret', '', 1, '/');
-      $this->setRedirect($baseurl, 'No Auth Token is set.');
     }
-  }
 
   function mapping() {
     global $mainframe;
-    $helper = new ComTwitterHelper();
+    $helper = new ComAllPlayersHelper();
 
     if (
       isset($_SESSION['com_twitter_credentials']) && 
@@ -78,16 +84,16 @@ class twitterController extends JController
         //Not Logged in. Just head directly to the view.
         if ($user->id == 0) {
         require_once (JPATH_COMPONENT.DS.'views'.DS.'mapping'.DS.'view.html.php');
-        $view = new twitterViewMapping();
+        $view = new allplayersViewMapping();
         $view->display();
       } else {
         $mapping = $helper->getJoomlaUserMapping($user->id);
         if ($mapping) {
           $helper->clearCookies();
-          $this->setRedirect('index.php','You already have another twitter mapping');
+          $this->setRedirect('index.php','You already have another All-Players mapping');
         } else {
           $helper->setUserMapping();
-          $this->setRedirect('index.php', 'Twitter user mapping complete And user logged in successfully.');
+          $this->setRedirect('index.php', 'All-Players user mapping complete And user logged in successfully.');
         }
       }
     } else {
@@ -129,9 +135,9 @@ class twitterController extends JController
 	{
 		global $mainframe;
     try {
-      $helper = new ComTwitterHelper($consumer->key, $consumer->secret);
+      $helper = new ComAllPlayersHelper($consumer->key, $consumer->secret);
     } catch (Exception $e) {
-      $msg = "Could not retrieve Twitter Consumer info. Have you installed com_twitter and configured it?";
+      $msg = "Could not retrieve Twitter Consumer info. Have you installed com_allplayers_auth and configured it?";
       $this->setRedirect('index.php', $msg);
     }
     try {
@@ -145,7 +151,7 @@ class twitterController extends JController
         $helper->setUserMapping();
         $this->setRedirect('index.php', 'Twitter user mapping complete And user logged in successfully.');
       } else {
-        $return = JRoute::_('index.php?option=com_twitter&view=mapping&task=mapping');
+        $return = JRoute::_('index.php?option=com_allplayers_auth&view=mapping&task=mapping');
         $this->setRedirect($return, '');
       }
     } catch (Exception $e) {
@@ -155,7 +161,7 @@ class twitterController extends JController
 
 	function createUser() {
 		global $mainframe;
-    $helper = new ComTwitterHelper();
+    $helper = new ComAllPlayersHelper();
     $twitterInfo = $helper->getCredentials();
 
 		jimport('joomla.user.helper');
@@ -181,7 +187,7 @@ class twitterController extends JController
 		$user = JFactory::getUser();
 		if (!$user->bind($userVals)) {
 			$mainframe->enqueueMessage("Unable to bind user", 'error');
-			$mainframe->redirect(JRoute::_('index.php?com_twitter&view=mapping&task=mapping', false));
+			$mainframe->redirect(JRoute::_('index.php?com_allplayers_auth&view=mapping&task=mapping', false));
 		}
 
 		$user->set('id', 0);
@@ -194,7 +200,7 @@ class twitterController extends JController
         "Unable to save user. " .
         "Please try again and ensure that your username and email address are not already taken.", 
         'error');
-			$mainframe->redirect(JRoute::_('index.php?com_twitter&view=mapping&task=mapping', false));
+			$mainframe->redirect(JRoute::_('index.php?com_allplayers_auth&view=mapping&task=mapping', false));
 		}
 
 		if ($mainframe->login(array('username'=>$username, 'password'=>$password))) {

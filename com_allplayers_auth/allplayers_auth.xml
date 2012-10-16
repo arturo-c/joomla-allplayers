@@ -16,28 +16,33 @@
 		<filename>helper.php</filename>
 		<filename>twitter-signin.png</filename>
 		<folder>views</folder>
-		<folder>twitter-async</folder>
+		<folder>assets</folder>
+		<folder>vendor</folder>
 	</files>
-  <install>
-    <!--    <sql>
-          <file charset="utf8" driver="mysql">install.sql</file>
-          <file driver="mysql">install.sql</file>
-      </sql> -->
-  </install>
-  <uninstall>
-   <!--    <sql>
-          <file charset="utf8" driver="mysql">uninstall.sql</file>
-          <file driver="mysql">uninstall.sql</file>
-      </sql> -->
-  </uninstall>
+	<media destination="com_allplayers_auth" folder="media">
+		<filename>index.html</filename>
+		<folder>images</folder>
+	</media>
+	<install>
+		<sql>
+			<file charset="utf8" driver="mysql">install.sql</file>
+			<file driver="mysql">install.sql</file>
+		</sql>
+	</install>
+	<uninstall>
+		<sql>
+		<file charset="utf8" driver="mysql">uninstall.sql</file>
+		<file driver="mysql">uninstall.sql</file>
+		</sql>
+	</uninstall>
 	<administration>
-		<menu>Allplayers Auth</menu>
+		<menu>All-Players-Auth</menu>
 		<files folder="admin">
 			<filename>index.html</filename>
 			<filename>allplayers_auth.php</filename>
 			<filename>controller.php</filename>
-<!--       <filename>install.sql</filename>
-      <filename>uninstall.sql</filename> -->
+			<filename>install.sql</filename>
+			<filename>uninstall.sql</filename>
 			<folder>views</folder>
 		</files>
 	</administration>

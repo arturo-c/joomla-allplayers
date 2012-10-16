@@ -1,10 +1,10 @@
 <?php
 /**
  * @version	0.1
- * @package	twitter
- * @author Mobilada.com
- * @author mail	info@mobilada.com
- * @copyright	Copyright (C) 2009 Mobilada.com - All rights reserved.
+ * @package	allplayers_auth
+ * @author Zach Curtis, Wayin Inc
+ * @author mail	info@wayin.com
+ * @copyright	Copyright (C) 2012 Wayin.com - All rights reserved.
  * @license		GNU/GPL
  */
  
@@ -20,7 +20,7 @@ function checkUsernameAvailable(usernameField) {
   if (testName != '')
     var myXHR = new XHR({method:'get', onSuccess:showUsernameSuccess}).send(
       'index.php', 
-      'option=com_twitter&task=checkUsernameAvailable&username='+testName
+      'option=com_allplayers_auth&task=checkUsernameAvailable&username='+testName
     );
 }
 
@@ -38,7 +38,7 @@ function checkEmailAvailable(emailField) {
   if (testEmail != '' && isEmail(testEmail))
     var myXHR = new XHR({method:'get', onSuccess:showEmailSuccess}).send(
       'index.php', 
-      'option=com_twitter&task=checkEmail&email='+testEmail);
+      'option=com_allplayers_auth&task=checkEmail&email='+testEmail);
 }
 
   function showEmailSuccess(req) {
@@ -55,7 +55,7 @@ function isEmail( text ) {
   return regex.test( text );
 }
 </script>
-<p>Thank you for sign-ing in with <a href="http://twitter.com">Twitter</a>. If you have an account on this site please log in to map your account. Otherwise please supply your information for us to create an account for you.</p>
+<p>Thank you for sign-ing in with <a href="http://www.allplayers.com.com">All-Players</a>. If you have an account on this site please log in to map your account. Otherwise please supply your information for us to create an account for you.</p>
 <div>
 <form action="" method="post" name="form" style="float:left; width: 45%;">
 	<fieldset>
@@ -96,7 +96,7 @@ function isEmail( text ) {
 		</div><input type="password" class="inputbox" name="password2" value="" size="20" /><br/>
 		<input type="submit" class="button" value="<?php echo JText::_("Register"); ?>" />
 
-		<input type="hidden" name="option" value="com_twitter" />
+		<input type="hidden" name="option" value="com_allplayers_auth" />
 		<input type="hidden" name="task" value="createUser" />
 	</fieldset>
 </form>

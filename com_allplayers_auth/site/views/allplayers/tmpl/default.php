@@ -11,16 +11,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport( 'joomla.application.component.view' );
+#$document = &JFactory::getDocument();
 
-class allplayersViewMapping extends Jview {
-
-	function __construct() {
-		parent::__construct();
-	}
-	
-	function display($tpl = null) {
-		parent::display($tpl);
-	}
-	
-}
+?>
+Redirecting to All-Players for authentication...

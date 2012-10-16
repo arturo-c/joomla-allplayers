@@ -1,12 +1,11 @@
 <?php
 /**
- * @version	0.1
- * @package	twitter
- * @author Mobilada.com
-nfo@mobilada.com/g
- * @author mail	info@mobilada.com
- * @copyright	Copyright (C) 2009 Mobilada.com - All rights reserved.
- * @license		GNU/GPL
+ * @version 1.0
+ * @package com_allplayers_auth
+ * @author Zach Curtis, Wayin Inc, Zach Curtis
+ * @author mail info@wayin.com
+ * @copyright   Copyright (C) 2012 Wayin.com - All rights reserved.
+ * @license     GNU/GPL
  */
  
 // no direct access
@@ -14,35 +13,50 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport( 'joomla.application.component.view' );
 
-class twitterViewtwitter extends Jview
+class allplayersViewallplayers extends Jview
 {
 
-	function __construct()
-	{
-		parent::__construct();
-    $this->db = JFactory::getDBO();
-	}
-	
-	function display($tpl = null)
-	{
-    $key = JRequest::getVar( 'consumer_key' );
-    $secret = JRequest::getVar( 'consumer_secret' );
+    function __construct() {
+        parent::__construct();
+        $this->db = JFactory::getDBO();
+    }
+    
+    function display($tpl = null) {
+        global $mainframe, $option;
 
-    $this->db->execute('truncate #__twitter_consumer');
+        $this->addToolbar();
+        
+        $db = JFactory::getDBO();
 
-    $this->db->execute(
-      sprintf("insert into #__twitter_consumer values(DEFAULT, '%s', '%s')", 
-        $this->db->getEscaped($key),
-        $this->db->getEscaped($secret)
-      )
-    ); 
+        $key = JRequest::getVar( 'consumer_key' );
+        $secret = JRequest::getVar( 'consumer_secret' );
+        $oauthurl = JRequest::getVar('oauth_url');
+        $verifypeer = JRequest::getVar('verify_peer');
+        if ($verifypeer){
+            $verifypeer = 1;
+        }
 
-    $this->db->setQuery('select * from #__twitter_consumer');
-    $consumer = $this->db->loadObject();
-		
-    $this->assignRef('consumer', $consumer);
-		
-    parent::display($tpl);
-	}
-	
+        $db->setQuery('TRUNCATE #__allplayers_auth');
+        $db->query();
+        
+        $db->setQuery('INSERT INTO #__allplayers_auth VALUES(DEFAULT, "'.$key.'", "'.$secret.'", "'.$oauthurl.'", "'.$verifypeer.'")');
+        $db->query();
+        //var_dump($db->replacePrefix( (string) $db->getQuery()) );//debug 
+       # JFactory::getApplication()->enqueueMessage( 'query: ' . $p);
+        $this->db->setQuery('SELECT * FROM #__allplayers_auth');
+        $consumer = $this->db->loadObject();
+            
+        $this->assignRef('consumer', $consumer);
+            
+        parent::display($tpl);
+    }
+
+    function save(){
+        //TODO: Add post logic and move save to separate function
+    }
+
+    function addToolbar(){
+        JToolBarHelper::title( 'All-Players Authentication', 'allplayers-logo.png' );
+    }
+    
 }
