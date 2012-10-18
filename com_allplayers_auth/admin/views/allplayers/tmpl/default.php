@@ -15,7 +15,7 @@ defined('_JEXEC') or die('Restricted access');
   <table>
     <tr>
       <td>Consumer Key: </td>
-      <td><input type="text" name="consumer_key" value="<?php echo $this->consumer->key ?>"/></td>
+      <td><input type="text" name="consumer_key" value="<?php echo $this->consumer->key ?>" /></td>
     </tr>
     <tr>
       <td>Consumer Secret: </td>

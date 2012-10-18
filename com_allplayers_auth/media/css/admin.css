@@ -1,3 +1,7 @@
 .icon-48-allplayers-logo{
 	background:url('../images/allplayers-logo.png') no-repeat;
 }
+
+form input[type="text"]{
+	min-width:200px;
+}

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version	0.1
+ * @version	1.0
  * @package	allplayers_auth
  * @author Zach Curtis, Wayin Inc
  * @author mail	info@wayin.com
@@ -11,7 +11,13 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-#$document = &JFactory::getDocument();
-
 ?>
+<?php if ($this->userLoggedIn == true){ ?>
+
+	<script>
+		if (window.parent){
+			self.close();
+		}
+	</script>
+<?php } ?>
 Redirecting to All-Players for authentication...
