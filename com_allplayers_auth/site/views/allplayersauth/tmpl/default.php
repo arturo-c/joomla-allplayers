@@ -11,8 +11,8 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-?>
-<?php if ($this->userLoggedIn == true){ ?>
+if ($this->userLoggedIn == true){
+    ?>
 
 	<script>
 		if (window.parent){

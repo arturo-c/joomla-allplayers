@@ -44,16 +44,16 @@ class plgAuthenticationAllPlayers extends JPlugin {
 		$success = 0;
 		$this->db = JFactory::getDBO();
 		
-		if (empty($credentials['id'])) {
+		if (empty($credentials['apid'])) {
 			$response->status = JAuthentication::STATUS_FAILURE;
-			$response->error_message = JText::_('JGLOBAL_AUTH_PASS_BLANK');
+			$response->error_message = JText::_('All-Players id is blank. Please try again.');
 			return false;
 		}
-		$query = 'SELECT * FROM #__users u INNER JOIN #__allplayers_auth_mapping aam ON aam.userid = u.id WHERE aam.allplayersid = "'.$credentials['id'].'"';
-
+		$query = 'SELECT * FROM #__users u INNER JOIN #__allplayers_auth_mapping aam ON aam.userid = u.id WHERE aam.allplayersid = "'.$credentials['apid'].'"';
+		
 		$this->db->setQuery($query);
 		$user = $this->db->loadObject();
-
+		
 		if ($user && $user->block == 0){
 			$success = 1;
 		} else {
@@ -62,7 +62,7 @@ class plgAuthenticationAllPlayers extends JPlugin {
 		}
 
 		$response->type = 'All-Players Authentication';
-		error_log('onUserAuthenticate! : '. $success);
+		
         if ($success) {
             JFactory::getApplication()->enqueueMessage('Successful All-Players login','message');
             $response->status        = JAuthentication::STATUS_SUCCESS;

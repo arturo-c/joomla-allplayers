@@ -10,6 +10,6 @@ CREATE TABLE #__allplayers_auth (
 DROP TABLE IF EXISTS #__allplayers_auth_mapping;
 CREATE TABLE #__allplayers_auth_mapping (
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-  `allplayersid` INT( 255 ) NOT NULL UNIQUE,
+  `allplayersid` VARCHAR( 200 ) NOT NULL UNIQUE,
   `userid` INT NOT NULL UNIQUE
 ) ENGINE = InnoDB;

@@ -17,38 +17,5 @@
 		<language tag="en-GB">en-GB.plg_allplayers_authentication.ini</language>
 	</languages>
 	<config>
-		<fields name="params">
-			<fieldset name="basic">
-				<field 
-					name="consumer_key"
-					type="text"
-					size="50"
-					label="PLG_ALLPLAYERS_FIELD_CONSUMERKEY_LABEL"
-					description="PLG_ALLPLAYERS_FIELD_CONSUMERKEY_DESC"
-					/>
-				<field 
-					name="consumer_secret"
-					type="text"
-					size="50"
-					label="PLG_ALLPLAYERS_FIELD_CONSUMERSECRET_LABEL"
-					description="PLG_ALLPLAYERS_FIELD_CONSUMERSECRET_DESC"
-					/>
-				<field 
-					name="auth_domain"
-					type="text"
-					size="50"
-					label="PLG_ALLPLAYERS_FIELD_AUTHDOMAIN_LABEL"
-					description="PLG_ALLPLAYERS_FIELD_AUTHDOMAIN_DESC"
-					default="https://www.allplayers.com"
-					/>
-				<field name="verifypeer" type="radio"
-					default="1"
-					description="PLG_ALLPLAYERS_FIELD_VERIFYPEER_DESC"
-					label="PLG_ALLPLAYERS_FIELD_VERIFYPEER_LABEL">
-					<option value="0">JNo</option>
-					<option value="1">JYes</option>
-				</field>
-			</fieldset>
-		</fields>
 	</config>
 </install>

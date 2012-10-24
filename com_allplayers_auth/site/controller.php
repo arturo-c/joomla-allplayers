@@ -14,7 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 jimport('joomla.application.component.controller');
 include_once(JPATH_BASE . "/components/com_allplayers_auth/helper.php");
 
-class AllPlayersController extends JController {
+class AllPlayersAuthController extends JController {
     protected $data;
 
     function __construct() {
@@ -30,44 +30,46 @@ class AllPlayersController extends JController {
         $app = JFactory::getApplication();
         // Get the log in credentials.
         $credentials = array();
-        $credentials['id'] = $userInfo->id;
+        $credentials['apid'] = $userInfo->apid;
         $credentials['username'] = $userInfo->email;
         $credentials['password'] = 'stuff'; //password cannot be blank for joomla but is not needed for all-players
-
         // Perform the log in.
         return $app->login($credentials);
     }
     
-    public function display($tpl = null) {
-        parent::display($tpl);
+    public function display($cachable = false, $urlparams = false) {
+        parent::display($cachable, $urlparams);
     }
     
 
     public function callback() {
+        global $mainframe;
         $userInfo = null;
         $helper = new ComAllPlayersHelper();
+        $app = JFactory::getApplication();
         $baseurl = $this->baseurl;
-        
+
         if ($_GET['oauth_token']) {
             try {
                 $oauth_token = $this->session->get('access_token');
                 $secret = $this->session->get('access_secret');
-
+   
                 $userInfo = $helper->doLogin($oauth_token, $secret);
 
             } catch (Exception $e) {
                 $je = json_decode($e->getMessage());
-                $this->setRedirect(JRoute::_('index.php'), "Error");
+                $this->setRedirect(JRoute::_('index.php'), "Error: ". $e->getMessage());
             }
-            
+
             if ($userInfo) {
                  if ($mapping = $helper->getUserMapping($userInfo)) {
                      // log in user  
                      // For login we are using an authentication plugin.
                     if (true == $this->logUserIn($userInfo)){
-                        $this->setRedirect(JRoute::_('index.php?option=com_allplayers_auth'));
+             
+                        $app->redirect(JRoute::_('index.php?option=com_allplayers_auth&task=close'));
                     } else {
-
+                        $this->setRedirect(JRoute::_('index.php?option=com_allplayers_auth'));
                     }
                  } else {
                     //There is no mapping lets do some mappings!
@@ -75,46 +77,34 @@ class AllPlayersController extends JController {
                  }
              } 
         } else {
-            setcookie('oauth_token', '', 1, '/');
-            setcookie('oauth_token_secret', '', 1, '/');
+            $helper->clearCookies();
             $this->setRedirect($baseurl, 'No Auth Token is set.');
         }
     }
 
     public function mapping() {
         $helper = new ComAllPlayersHelper();
+        $app = JFactory::getApplication();
+        $jUser = $helper->getJoomlaAllPlayersUser();
+        $apUser = $helper->getCredentials();
         $credentials = $this->session->get('com_allplayers_credentials');
-       
-        if (isset($credentials) /* && $credentials->oauth_token == $_COOKIE['oauth_token'] && $credentials->oauth_token_secret == $_COOKIE['oauth_token_secret']*/) {
-            // Check if already logged in
-            $user = JFactory::getUser();
-            
-            //Not Logged in. Just head directly to the view.
-            if ($user->id == 0) {
-                // require_once (JPATH_COMPONENT.DS.'views'.DS.'mapping'.DS.'view.html.php');
-                // $view = new allplayersViewMapping();
-                // $view->display();
-                $createdUser = $this->createUser($credentials->user);
-                if ($createdUser){
-                    parent::display();
-                } else {
-                   // $this->setRedirect(JRoute::_('index.php?option=com_allplayers_auth&view=mapping&task=mapping'));
-                }
-            } else {
-                $mapping = $helper->getJoomlaUserMapping($user->id);
-                if ($mapping) {
-                    $helper->clearCookies();
-                    $this->setRedirect('index.php','You already have another All-Players mapping');
-                } else {
-                    $helper->setUserMapping($credentials->user, $user->id);
-                    //$this->setRedirect('index.php', 'All-Players user mapping complete And user logged in successfully.');
-                    parent::display();
-                }
+
+        //I have a joomla user
+        if (isset($jUser)){
+
+            if ($jUser->allplayersid == null){
+                $helper->setUserMapping($apUser, $jUser->id);
             }
+
+            $this->logUserIn($apUser);
+            $app->redirect(JRoute::_('index.php?option=com_allplayers_auth&task=close'));
         } else {
-          $this->setRedirect($this->baseurl);
+
+            $createdUser = $this->createUser($credentials->user);
+            //Close window after create.
+            $app->redirect(JRoute::_('index.php?option=com_allplayers_auth&task=close'));
         }
-      }
+    }
 
     
    public function getData($userInfo) {
@@ -124,7 +114,7 @@ class AllPlayersController extends JController {
             $app    = JFactory::getApplication();
             $params = JComponentHelper::getParams('com_users');
 
-            $this->data->apid = $userInfo->id;
+            $this->data->apid = $userInfo->apid;
             $this->data->name = $userInfo->nickname;
             $this->data->username = $userInfo->email;
             $this->data->email = $userInfo->email;
@@ -158,29 +148,29 @@ class AllPlayersController extends JController {
         }
 
         // Initialise the table with JUser.
-        $user = new JUser;
+        $jUser = new JUser;
         $data = (array)$this->getData($userInfo);
         $data['password'] = JApplication::getHash(JUserHelper::genRandomPassword());
         $data['block'] = 0;
         $useractivation = $params->get('useractivation');
         $sendpassword = $params->get('sendpassword', 1);
-        
+    
         // Bind the data.
-        if (!$user->bind($data)) {
-            $this->setError(JText::sprintf('COM_USERS_REGISTRATION_BIND_FAILED', $user->getError()));
+        if (!$jUser->bind($data)) {
+            $this->setError(JText::sprintf('COM_USERS_REGISTRATION_BIND_FAILED', $jUser->getError()));
             return false;
         }
     
         // Load the users plugin group.
         JPluginHelper::importPlugin('user');
         // Store the data.
-        if (!$user->save()) {
+        if (!$jUser->save()) {
             $this->setError(JText::sprintf("Unable to save user. " .
         "Please try again and ensure that your username and email address are not already taken.", 
         'error', $user->getError()));
             return false;
         } else {
-            $helper->setUserMapping($userInfo, $user->id);
+            $helper->setUserMapping($userInfo, $jUser->id);
         }
 
         // Perform the log in.

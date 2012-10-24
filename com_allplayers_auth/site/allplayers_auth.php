@@ -15,7 +15,7 @@ defined('_JEXEC') or die('Restricted access');
 jimport('joomla.application.component.controller');
  
 // Get an instance of the controller prefixed by AllPlayers
-$controller = JController::getInstance('AllPlayers');
+$controller = JController::getInstance('AllPlayersAuth');
  
 // Perform the Request task
 $input = JFactory::getApplication()->input;

@@ -13,7 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport( 'joomla.application.component.view' );
 
-class allplayersViewMapping extends Jview {
+class allplayersauthViewmapping extends Jview {
 
 	function __construct() {
 		parent::__construct();

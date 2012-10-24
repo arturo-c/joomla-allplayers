@@ -11,6 +11,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 ?>
+Mapping credentials
 <script>
 
 	if (window.parent){

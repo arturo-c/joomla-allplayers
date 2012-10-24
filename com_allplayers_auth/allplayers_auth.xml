@@ -15,7 +15,6 @@
 		<filename>allplayers_auth.php</filename>
 		<filename>controller.php</filename>
 		<filename>helper.php</filename>
-		<filename>twitter-signin.png</filename>
 		<folder>views</folder>
 		<folder>assets</folder>
 		<folder>vendor</folder>
