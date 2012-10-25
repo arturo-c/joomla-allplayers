@@ -25,7 +25,10 @@ class AllPlayersAuthController extends JController {
         $this->db = JFactory::getDBO();
         $this->session = JFactory::getSession();
     }
-
+    public function login(){
+        $helper = new ComAllPlayersHelper();
+        return $this->logUserIn($helper->getCredentials());
+    }
     private function logUserIn($userInfo){
         $app = JFactory::getApplication();
         // Get the log in credentials.
@@ -41,9 +44,14 @@ class AllPlayersAuthController extends JController {
         parent::display($cachable, $urlparams);
     }
     
+    public function close(){
+        require_once (JPATH_COMPONENT.DS.'views'.DS.'allplayersauth'.DS.'view.html.php');
+        $view = new allplayersauthViewallplayersauth();
+        $view->display();
+       
+    }
 
     public function callback() {
-        global $mainframe;
         $userInfo = null;
         $helper = new ComAllPlayersHelper();
         $app = JFactory::getApplication();
@@ -62,14 +70,14 @@ class AllPlayersAuthController extends JController {
             }
 
             if ($userInfo) {
-                 if ($mapping = $helper->getUserMapping($userInfo)) {
+                 if ($mapping = $helper->getUserMapping($userInfo->apid)) {
                      // log in user  
                      // For login we are using an authentication plugin.
                     if (true == $this->logUserIn($userInfo)){
              
                         $app->redirect(JRoute::_('index.php?option=com_allplayers_auth&task=close'));
                     } else {
-                        $this->setRedirect(JRoute::_('index.php?option=com_allplayers_auth'));
+                        $this->setRedirect(JRoute::_('index.php?option=com_allplayers_auth'), "Mapping set but could not login.");
                     }
                  } else {
                     //There is no mapping lets do some mappings!
@@ -167,7 +175,7 @@ class AllPlayersAuthController extends JController {
         if (!$jUser->save()) {
             $this->setError(JText::sprintf("Unable to save user. " .
         "Please try again and ensure that your username and email address are not already taken.", 
-        'error', $user->getError()));
+        'error', $jUser->getError()));
             return false;
         } else {
             $helper->setUserMapping($userInfo, $jUser->id);

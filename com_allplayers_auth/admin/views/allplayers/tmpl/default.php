@@ -39,3 +39,29 @@ defined('_JEXEC') or die('Restricted access');
   </table>
   <?php echo JHtml::_('form.token'); ?>
 </form>
+<div>
+    <p>Popup window installation: Add this script to your sites custom javascript file. </p>
+    <p>
+        //On document ready
+        $(function(){
+            $('a.allplayers-login').click(function(ev){
+                ev.preventDefault();
+                var redirectUrl = $(this).attr('href');
+                var path = '';
+                if (location.host.indexOf('localhost') !== -1){
+                    path = '/MYFOLDER/index.php?option=com_allplayers_auth';
+                } else {
+                    path = '/index.php?option=com_allplayers_auth';
+                }
+
+                var oauthWindow   = window.open(path, 'ConnectWithOAuth', 'location=0,status=0,width=600,height=700,scrollbars=yes');
+                var oauthInterval = window.setInterval(function(){
+                if (oauthWindow.closed) {
+                    window.clearInterval(oauthInterval);
+                    window.location = redirectUrl;
+                }
+                }, 1000);
+            });
+        });
+    </p>
+</div>

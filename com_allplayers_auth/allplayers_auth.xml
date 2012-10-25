@@ -8,7 +8,10 @@
 	<copyright>Copyright (C) 2012 Wayin.com - All rights reserved.</copyright>
 	<version>1.0</version>
 	<license>GNU / GPL</license>
-	<description><![CDATA[All-Players Auth is a component for All-Players oauth and joomla integration. This component depends on the All-PLayers Authentication Plugin]]></description>
+	<description><![CDATA[
+		All-Players Auth is a component for All-Players oauth and joomla integration. This component depends on the All-PLayers Authentication Plugin. 
+		<p>Open the component to view installation instructions.</p>
+		]]></description>
 	<scriptfile>install.script.php</scriptfile>
 	<files folder="site">
 		<filename>index.html</filename>

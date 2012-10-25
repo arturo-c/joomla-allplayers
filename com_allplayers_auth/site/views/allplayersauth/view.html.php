@@ -64,18 +64,15 @@ class allplayersauthViewallplayersauth extends Jview{
     	    $this->session->set('access_token', $oauth_tokens['oauth_token']);
     	    $this->session->set('access_secret', $oauth_tokens['oauth_token_secret']);
     	   
-
     	    $authorize = '/oauth/authorize?oauth_token=' . $oauth_tokens['oauth_token'];
         	$authorize .= '&oauth_callback=' . urlencode($uri->toString().'&task=callback');
-        	error_log('Redirecting from initLogin: '. $consumer->oauthurl . $authorize);
+ 
         	$app->redirect($consumer->oauthurl . $authorize, null, null, true, true);
 	    }
 	    return false;
 	}
 
 	public function display($tpl = null) {
-		$userLoggedIn = 'false';
-		global $mainframe;
         $helper = new ComAllPlayersHelper();
         $app = JFactory::getApplication();
         $jUser = $helper->getJoomlaAllPlayersUser();
@@ -84,16 +81,20 @@ class allplayersauthViewallplayersauth extends Jview{
 
         if (!$apUser){
         	$this->initLogin();
-
         }
 
 		//I have a joomla user
-        if (isset($jUser) && isset($apUser)){
+        if (isset($apUser)){
+        	$currentuser = JFactory::getUser();
+        	if (isset($currentuser)){
+        		$app->redirect(JRoute::_('index.php?option=com_allplayers_auth&task=login'));
+        	}
+        	
 			$this->assign('userLoggedIn', 'true');
         	parent::display($tbl);
         //I do not have a joomla user
         } else {
-
+        	$app->redirect(JRoute::_('index.php?option=com_allplayers_auth&view=mapping&task=mapping'));
         }
 	
 	}

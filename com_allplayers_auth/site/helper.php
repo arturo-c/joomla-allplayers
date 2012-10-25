@@ -29,11 +29,12 @@ class ComAllPlayersHelper {
     return $mapping;
   }
 
-  function getUserMapping($userInfo = null) {
-    if (!$userInfo){
+  function getUserMapping($apid = null) {
+    if (!$apid){
         $userInfo = $this->getCredentials();
+        $apid = $userInfo->apid;
     }
-    $query = 'SELECT * FROM #__allplayers_auth_mapping WHERE allplayersid="'.$userInfo->apid.'"';
+    $query = 'SELECT * FROM #__allplayers_auth_mapping WHERE allplayersid="'.$apid.'"';
     $this->db->setQuery($query);
     $mapping = $this->db->loadObject(); 
     return $mapping;
@@ -57,6 +58,17 @@ class ComAllPlayersHelper {
         $this->db->setQuery($query);
         $user = $this->db->loadObject();
     } 
+    if (!$user){
+        $apUser = $this->getCredentials();
+        $query = 'SELECT * FROM #__users u WHERE u.username = "'.$apUser->email.'"';
+        $this->db->setQuery($query);
+        $jUser = $this->db->loadObject();
+        //We have a matching joomla user but no mapping. Mapit.
+        if (isset($jUser)){
+            $this->setUserMapping($apUser, $jUser->id);
+        }
+        return $this->getJoomlaAllPlayersUser($apUser->apid);
+    }
     return $user;
   }
 
@@ -66,7 +78,7 @@ class ComAllPlayersHelper {
     }
 
     $query = 'INSERT INTO #__allplayers_auth_mapping VALUES(DEFAULT, "'.$userInfo->apid.'", "'.$jUserId.'")';
-     $this->db->setQuery($query);
+    $this->db->setQuery($query);
     return $this->db->query();
   }
 

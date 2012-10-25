@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright	Copyright (C) - 2012 Wayin, Inc. All rights reserved.
  * @license		GNU General Public License version 2 or later; see LICENSE.txt
  * @author Zach Curtis, Wayin Inc 2012
  * Libs provided by All-Players
@@ -10,21 +10,19 @@
 // No direct access
 defined('_JEXEC') or die;
 
-
-jimport( 'joomla.environment.uri' );
 jimport( 'joomla.plugin.plugin' );
 
 /**
- * All-Players Authentication Plugin
+ * All-Players User Profile Plugin
  *
  * @package		Joomla.Plugin
- * @subpackage	Authentication.allplayers
+ * @subpackage	Profile.allplayers
  * @since 2.5
  */
-class plgAuthenticationAllPlayers extends JPlugin {
+class plgAllPlayersUserProfile extends JPlugin
 	private $_app;
 
-	function plgAuthenticationAllPlayers(&$subject, $config = array()){
+	function plgAllPlayersUserProfile(&$subject, $config = array()){
 		parent::__construct($subject, $config);
 	}
        
@@ -38,40 +36,62 @@ class plgAuthenticationAllPlayers extends JPlugin {
 	 * @return	boolean
 	 * @since 1.5
 	 */
-	function onUserAuthenticate($credentials, $options, & $response) {
-		
-		$message = '';
-		$success = 0;
-		$this->db = JFactory::getDBO();
-		
-		if (empty($credentials['apid'])) {
-			$response->status = JAuthentication::STATUS_FAILURE;
-			$response->error_message = JText::_('All-Players id is blank. Please try again.');
-			return false;
+	function onContentPrepareData($context, $data) {
+		// Check we are manipulating a valid form.
+		if (!in_array($context, array('com_users.profile', 'com_users.user', 'com_users.registration', 'com_admin.profile'))) {
+			return true;
 		}
-		$query = 'SELECT * FROM #__users u INNER JOIN #__allplayers_auth_mapping aam ON aam.userid = u.id WHERE aam.allplayersid = "'.$credentials['apid'].'"';
 		
-		$this->db->setQuery($query);
-		$user = $this->db->loadObject();
-		
-		if ($user && $user->block == 0){
-			$success = 1;
-		} else {
-			$success = 0;
-			$message = "Could not verify Joomla and All-Players account.";
+		if (is_object($data)) {
+			$userId = isset($data->id) ? $data->id : 0;
+
+			if (!isset($data->profile) and $userId > 0) {
+				// Load the profile data from the database.
+				$db = JFactory::getDbo();
+				// $db->setQuery(
+				// 	'SELECT profile_key, profile_value FROM #__user_profiles' .
+				// 	' WHERE user_id = '.(int) $userId." AND profile_key LIKE 'profile.%'" .
+				// 	' ORDER BY ordering'
+				// );
+				
+				$results = $db->loadRowList();
+
+				// Check for a database error.
+				if ($db->getErrorNum())
+				{
+					$this->_subject->setError($db->getErrorMsg());
+					return false;
+				}
+
+				// Merge the profile data.
+				$data->profile = array();
+
+				foreach ($results as $v)
+				{
+					$k = str_replace('profile.', '', $v[0]);
+					$data->profile[$k] = json_decode($v[1], true);
+					if ($data->profile[$k] === null)
+					{
+						$data->profile[$k] = $v[1];
+					}
+				}
+			}
+
+			if (!JHtml::isRegistered('users.url'))
+			{
+				JHtml::register('users.url', array(__CLASS__, 'url'));
+			}
+			if (!JHtml::isRegistered('users.calendar'))
+			{
+				JHtml::register('users.calendar', array(__CLASS__, 'calendar'));
+			}
+			if (!JHtml::isRegistered('users.tos'))
+			{
+				JHtml::register('users.tos', array(__CLASS__, 'tos'));
+			}
 		}
 
-		$response->type = 'All-Players Authentication';
-		
-        if ($success) {
-            JFactory::getApplication()->enqueueMessage('Successful All-Players login','message');
-            $response->status        = JAuthentication::STATUS_SUCCESS;
-            $response->error_message = '';
-            $response->email         = $user->email;
-        }  else  {
-            $response->status         = JAuthentication::STATUS_FAILURE;
-            $response->error_message  = JText::sprintf('JGLOBAL_AUTH_FAILED', $message);
-        }
+		return true;
 
 	}
 }
