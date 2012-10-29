@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="component" version="2.5.0">
+	<name>All Players</name>
+	<author>Zach Curtis - Wayin Inc</author>
+	<authorEmail>zc@wayin.com</authorEmail>
+	<authorUrl>http://www.wayin.com</authorUrl>
+	<creationDate>October, 2012</creationDate>
+	<copyright>Copyright (C) 2012 Wayin.com - All rights reserved.</copyright>
+	<version>0.0.1</version>
+	<license>GNU / GPL</license>
+	<description><![CDATA[
+		All-Players Auth is a component for All-Players oauth and joomla integration. This component depends on the All-PLayers Authentication Plugin. 
+		<p>Open the component to view installation instructions.</p>
+		]]></description>
+
+	<languages folder="site/language">
+		<language tag="en-GB">en-GB.com_allplayers.ini</language>
+	</languages>
+
+	<scriptfile>install.script.php</scriptfile>
+	<files folder="site">
+		<filename>index.html</filename>
+		<filename>allplayers.php</filename>
+		<filename>helper.php</filename>
+		<folder>views</folder>
+		<folder>controllers</folder>
+		<folder>language</folder>
+	</files>
+
+	<media destination="com_allplayers" folder="media">
+		<filename>index.html</filename>
+		<folder>css</folder>
+		<folder>images</folder>
+		<folder>libraries</folder>
+	</media>
+	
+	<install>
+		<sql>
+			<file charset="utf8" driver="mysql">install.sql</file>
+			<file driver="mysql">install.sql</file>
+		</sql>
+	</install>
+	<uninstall>
+		<sql>
+		<file charset="utf8" driver="mysql">uninstall.sql</file>
+		<file driver="mysql">uninstall.sql</file>
+		</sql>
+	</uninstall>
+	<administration>
+		<languages folder="admin/language">
+			<language tag="en-GB">en-GB.com_allplayers.ini</language>
+			<language tag="en-GB">en-GB.com_allplayers.sys.ini</language>
+		</languages>
+		<menu>All-Players</menu>
+		<files folder="admin">
+			<filename>index.html</filename>
+			<filename>allplayers.php</filename>
+			<filename>install.sql</filename>
+			<filename>uninstall.sql</filename>
+			<folder>views</folder>
+			<folder>controllers</folder>
+		</files>
+	</administration>
+</install>

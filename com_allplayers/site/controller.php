@@ -1,7 +1,7 @@
 <?php
 /**
- * @version 1.0
- * @package allplayers_auth
+ * @version 0.0.1
+ * @package com_allplayers
  * @author Zach Curtis, Wayin Inc
  * @author mail info@wayin.com
  * @copyright Copyright (C) 2012 Wayin.com - All rights reserved.
@@ -12,9 +12,9 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('joomla.application.component.controller');
-include_once(JPATH_BASE . "/components/com_allplayers_auth/helper.php");
+include_once(JPATH_BASE . "/components/com_allplayers/helper.php");
 
-class AllPlayersAuthController extends JController {
+class AllPlayersController extends JController {
     protected $data;
 
     function __construct() {
@@ -43,7 +43,11 @@ class AllPlayersAuthController extends JController {
     public function display($cachable = false, $urlparams = false) {
         parent::display($cachable, $urlparams);
     }
-    
+    public function allplayers_profile(){
+        require_once (JPATH_COMPONENT.DS.'views'.DS.'allplayersprofile'.DS.'view.html.php');
+        $view = new allplayersauthViewallplayersauth();
+        $view->display();
+    }
     public function close(){
         require_once (JPATH_COMPONENT.DS.'views'.DS.'allplayersauth'.DS.'view.html.php');
         $view = new allplayersauthViewallplayersauth();
