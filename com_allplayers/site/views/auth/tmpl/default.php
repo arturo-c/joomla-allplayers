@@ -17,7 +17,7 @@ if ($this->userLoggedIn == true){
 	<script>
 		if (window.parent){
 			self.close();
-		}
+		} 
 	</script>
 <?php } ?>
 Redirecting to All-Players for authentication...

@@ -20,13 +20,16 @@ $media_path = '../media/com_allplayers/';
 $controller = JRequest::getWord('controller');
 $task       = JRequest::getWord('task');
 $view       = $app->input->getCmd('view');
-$type = $controller;
+
 if (!$task){
 	$task = 'display';
 }
-if (!$view){
+if (!$view && $controller){
 	$view = $controller;
+} else if ($view && !$controller){
+	$controller = $view;
 }
+$type = $controller;
 
 JRequest::setVar('controller', $controller);
 JRequest::setVar('task', $type.'.'.$task);

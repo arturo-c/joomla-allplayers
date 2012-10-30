@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-        <layout title="COM_ALLPLAYERS_ALLPLAYERSPROFILE_VIEW_DEFAULT_TITLE">
-                <message>
-                        <![CDATA[COM_ALLPLAYERS_ALLPLAYERSPROFILE_VIEW_DEFAULT_DESC]]>
-                </message>
-        </layout>
+	<layout title="AP Profile">
+		<message><![CDATA[Displays an All-Players Profile page]]></message>
+	</layout>
+
 </metadata>

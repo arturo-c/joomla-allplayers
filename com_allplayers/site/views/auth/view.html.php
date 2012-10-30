@@ -38,7 +38,7 @@ class allplayersViewauth extends Jview{
         $allplayersSession = $this->session->get('com_allplayers_credentials');
 
         if (!$apUser){
-        	$this->initLogin();
+        	$helper->initLogin();
         }
 
 		//I have a joomla user

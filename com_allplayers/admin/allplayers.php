@@ -35,16 +35,13 @@ if (!$controller){
 	$controller = 'AllPlayers';
 	$type="Default";
 }
+
 JRequest::setVar('controller', $controller);
 JRequest::setVar('task', $type.'.'.$task);
 JRequest::setVar('view', $app->input->getCmd('view'));
 // Get an instance of the default controller 
 $controller = JController::getInstance('AllPlayers');
 
-// change application
-if ($id = $app->input->get('changeapp')) {
-	$app->system->application->setUserState('com_allplayers', $id);
-}
 
 $controller->execute($app->input->getCmd('task'));
 

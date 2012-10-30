@@ -80,7 +80,6 @@ class AllPlayersControllerAuth extends JController {
                         $app->redirect(JRoute::_('index.php?option=com_allplayers&controller=auth'), "Mapping set but could not login.");
                     }
                  } else {
-                    error_log("\n\nNo Mapping!");
                     //There is no mapping lets do some mappings!
                     $app->redirect(JRoute::_('index.php?option=com_allplayers&controller=auth&view=mapping&task=mapping'));
                  }
