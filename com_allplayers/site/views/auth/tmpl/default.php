@@ -11,7 +11,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-if ($this->userLoggedIn == true){
+if ($this->userLoggedIn){
     ?>
 
 	<script>

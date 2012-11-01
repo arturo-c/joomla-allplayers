@@ -13,34 +13,27 @@ defined('_JEXEC') or die('Restricted access');
 
 ?>
 
-<form action="index.php" method="post" name="adminForm" accept-charset="utf-8">
+<form action="<?php echo JRoute::_('index.php?option=com_allplayers&layout=edit&id='.(int) $this->item->id); ?>" method="post" name="adminForm" id="item-form" class="form-validate">
   <table>
      <tr>
-      <td>Consumer Key: </td>
-      <td><input type="text" name="consumer_key" value="<?php echo $this->consumer->key ?>" /></td>
+      <td><?php echo $this->form->getLabel('key'); ?></td>
+      <td><?php echo $this->form->getInput('key'); ?></td>
     </tr>
     <tr>
-      <td>Consumer Secret: </td>
-      <td><input type="text" name="consumer_secret" value="<?php echo $this->consumer->secret ?>"/></td>
+      <td><?php echo $this->form->getLabel('secret'); ?></td>
+      <td><?php echo $this->form->getInput('secret'); ?></td>
     </tr>
     <tr>
-      <td>OAuth URL: </td>
-      <td><input type="text" name="oauth_url" value="<?php echo $this->consumer->oauthurl ?>" style="width:250px;"></td>
+      <td><?php echo $this->form->getLabel('oauthurl'); ?></td>
+      <td><?php echo $this->form->getInput('oauthurl'); ?></td>
     </tr>
     <tr>
-      <td>Verify Peer: </td>
-      <td>
-        <input type="checkbox" name="verify_peer" value="1" <?php if ($this->consumer->verifypeer){ ?>checked="checked"<?php } ?>>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" align="right">
-        <input type="submit" value="save" />
-      </td>
+      <td><?php echo $this->form->getLabel('verifypeer'); ?></td>
+      <td><?php echo $this->form->getInput('verifypeer'); ?></td>
     </tr>
   </table>
-  <input type="hidden" name="option" value="com_allplayers" />
-  <input type="hidden" name="controller" value="auth" />
-  <input type="hidden" name="task" value="save" />
+  <input type="hidden" name="task" value="" />
+  <input type="hidden" name="model" value="auth">
+  <input type="hidden" name="return" value="<?php echo JRequest::getCmd('return');?>" />
   <?php echo JHtml::_('form.token'); ?>
 </form>

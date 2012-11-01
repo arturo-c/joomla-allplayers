@@ -15,27 +15,17 @@ jimport('joomla.application.component.controller');
 
 $app = JFactory::getApplication('allplayers');
 $document = JFactory::$document;
-$media_path = '../media/com_allplayers/';
+$media_path = 'media/com_allplayers/';
 
-$controller = JRequest::getWord('controller');
-$task       = JRequest::getWord('task');
-$view       = $app->input->getCmd('view');
+$document->addScript($media_path.'libraries/jquery/jquery.js');
+$document->addScript($media_path.'js/profile.js');
 
-if (!$task){
-	$task = 'display';
-}
-if (!$view && $controller){
-	$view = $controller;
-} else if ($view && !$controller){
-	$controller = $view;
-}
-$type = $controller;
+JHTML::_('behavior.modal', 'a.modal');
+JHTML::_('behavior.framework',true);
+$uncompressed = JFactory::getConfig()->get('debug') ? '-uncompressed' : '';
+JHTML::_('script','system/modal'.$uncompressed.'.js', true, true);
+JHTML::_('stylesheet','media/system/css/modal.css');
 
-JRequest::setVar('controller', $controller);
-JRequest::setVar('task', $type.'.'.$task);
-JRequest::setVar('view', $view);
-
-// Get an instance of the default controller 
 $controller = JController::getInstance('AllPlayers');
-
-$controller->execute($task);
+$controller->execute(JRequest::getCmd('task'));
+$controller->redirect();

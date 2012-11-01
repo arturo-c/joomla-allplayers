@@ -15,6 +15,8 @@ jimport( 'joomla.application.component.view' );
 
 class allplayersViewauth extends Jview
 {
+    protected $form;
+    protected $item;
 
     function __construct() {
       parent::__construct();
@@ -22,12 +24,11 @@ class allplayersViewauth extends Jview
     }
     
     function display($tpl = null) {
-        $model = $this->getModel();
+        $this->form     = $this->get('Form');
+        $this->item     = $this->get('Item');
 
-        $consumer = $model->getConsumer();
-        $this->assign('consumer', $consumer);
+        $this->assign('consumer', $this->item);
 
         parent::display($tpl);
     }
-    
 }

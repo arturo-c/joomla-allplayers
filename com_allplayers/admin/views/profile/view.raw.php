@@ -18,16 +18,16 @@ class allplayersViewprofile extends Jview
 
     function __construct() {
       parent::__construct();
-      $this->db = JFactory::getDBO();
     }
     
     function display($tpl = null) {
-		// require_once (JPATH_COMPONENT.DS.'views'.DS.'allplayersauth'.DS.'view.html.php');
-  //       $view = new allplayersViewallplayersauth();
-  //       $view->display();
-    	
-       // JRequest::setVar('auth_view', $view);
-        parent::display($tpl);
+      $model = $this->getModel();
+      $config = $model->loadFormData();
+      $this->group = $model->group;
+      $this->user = $model->user;
+      parent::display($tpl);
+
+
     }
     
 }

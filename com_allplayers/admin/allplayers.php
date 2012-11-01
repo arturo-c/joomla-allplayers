@@ -27,28 +27,6 @@ $document->addScript($media_path.'js/admin.js');
 
 JHTML::_('behavior.modal', 'a.modal');
 
-$controller = JRequest::getWord('controller');
-$task       = JRequest::getWord('task');
-$type = $controller;
-if (!$task){ $task = 'default';}
-if (!$controller){
-	$controller = 'AllPlayers';
-	$type="Default";
-}
-
-JRequest::setVar('controller', $controller);
-JRequest::setVar('task', $type.'.'.$task);
-JRequest::setVar('view', $app->input->getCmd('view'));
-// Get an instance of the default controller 
 $controller = JController::getInstance('AllPlayers');
-
-
-$controller->execute($app->input->getCmd('task'));
-
-
-try {
-	// Redirect if set by the controller
-	$controller->redirect();
-} catch (AppException $e) {
-	$app->error->raiseError(500, $e);
-}
+$controller->execute(JRequest::getCmd('task'));
+$controller->redirect();

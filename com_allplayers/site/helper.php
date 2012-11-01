@@ -23,6 +23,16 @@ class ComAllPlayersHelper {
     $this->consumer = $consumer;
     $this->session = JFactory::getSession();
   }
+  public function mapExistingJoomlaUser($username){
+    $this->db->setQuery('SELECT id FROM #__users WHERE username="'.$username.'"');
+    $jUser = $this->db->loadObject();
+    if ( isset($jUser) ){
+        return $this->setUserMapping(null, $jUser->id);
+    } else {
+        return null;
+    }
+    
+  }
 
   function getJoomlaUserMapping($id) {
     $this->db->setQuery('SELECT * FROM #__allplayers_auth_mapping WHERE userid="'.$id.'"');
@@ -42,9 +52,10 @@ class ComAllPlayersHelper {
   }
 
   function getJoomlaAllPlayersUser($apid = null){
+    $app = JFactory::getApplication();
     $user = null;
     if (!$apid){
-        if ($this->areCookiesSet()){
+        if (isset($_COOKIE['user_apid'])){
             $apid = $_COOKIE['user_apid'];
         } else {
             $session = $this->session->get('com_allplayers_credentials');
@@ -56,22 +67,29 @@ class ComAllPlayersHelper {
         } 
     }
 
-    if ($apid){
+    if (isset($apid)){
         $query = 'SELECT u.*, aam.allplayersid FROM #__users u INNER JOIN #__allplayers_auth_mapping aam ON aam.userid = u.id WHERE aam.allplayersid = "'.$apid.'"';
         $this->db->setQuery($query);
         $user = $this->db->loadObject();
     } 
-    if (!$user){
-        $apUser = $this->getCredentials();
-        $query = 'SELECT * FROM #__users u WHERE u.username = "'.$apUser->email.'"';
-        $this->db->setQuery($query);
-        $jUser = $this->db->loadObject();
-        //We have a matching joomla user but no mapping. Mapit.
-        if (isset($jUser)){
-            $this->setUserMapping($apUser, $jUser->id);
-        }
-        return $this->getJoomlaAllPlayersUser($apUser->apid);
-    }
+    // if (!isset($user)){
+
+    //     $apUser = $this->getCredentials();
+    //     error_log('getJoomlaAllPlayersUser: user not set. '. isset($user));
+    //     if ($apUser != null){
+    //         $query = 'SELECT * FROM #__users u WHERE u.username = "'.$apUser->email.'"';
+    //         $this->db->setQuery($query);
+    //         $jUser = $this->db->loadObject();
+    //         //We have a matching joomla user but no mapping. Mapit.
+    //         if (isset($jUser)){
+    //             $mapping = $this->setUserMapping($apUser, $jUser->id);
+    //             if (isset($mapping)){
+    //                error_log('got mapping: '.$mapping);
+    //                $user = $this->getJoomlaAllPlayersUser($apUser->apid);
+    //             }
+    //         }
+    //     }
+    // }
     return $user;
   }
 
@@ -89,7 +107,7 @@ class ComAllPlayersHelper {
     $userInfo = null;
 
     $allplayersSession = $this->session->get('com_allplayers_credentials');
-    
+
     if ( isset($allplayersSession)) {
         if ($allplayersSession->oauth_token && $allplayersSession->user /*== $_COOKIE['oauth_token'] && $allplayersSession->oauth_token_secret == $_COOKIE['oauth_token_secret']*/){
             $userInfo = $allplayersSession->user;
@@ -145,31 +163,32 @@ class ComAllPlayersHelper {
 
         $this->session->set('com_allplayers_credentials', $user_credentials);
         $cookie_expire_time = time()+60*60*24*30*3; //60 days
-        setcookie('user_apid', $ui->apid, $cookie_expire_time);
-        setcookie('apoauth_token', $user_credentials->oauth_token, $cookie_expire_time);
-        setcookie('apoauth_token_secret', $user_credentials->oauth_token_secret, $cookie_expire_time);
+
+        setcookie('user_apid', $ui->apid, $cookie_expire_time, '/');
+        setcookie('apoauth_token', $user_credentials->oauth_token, $cookie_expire_time, '/');
+        setcookie('apoauth_token_secret', $user_credentials->oauth_token_secret, $cookie_expire_time, '/');
 
         $userInfo = $ui;
       } catch(Exception $e){
+        error_log("\nEXCEPTION Could not get credentials (helper): ". $e->getMessage());
         throw $e;
       }
     }
     return $userInfo;
   }
 
-  function areCookiesSet() {
-    if (isset($_COOKIE['apoauth_token']) && isset($_COOKIE['apoauth_token_secret']) && isset($_COOKIE['user_apid'])) {
-      return true;
-    } else {
-      $this->clearCookies();
-      return false;
+    function areCookiesSet() {
+        if (isset($_COOKIE['apoauth_token']) && isset($_COOKIE['apoauth_token_secret'])) {
+            return true;
+        } else {
+            $this->clearCookies();
+            return false;
+        }
     }
-  }
 
     public function clearCookies() {
-        setcookie('apoauth_token', '', 1);
-        setcookie('apoauth_token_secret', '', 1);
-        setcookie('user_apid', '', 1);
+        setcookie('apoauth_token', '', time()-3600, '/');
+        setcookie('apoauth_token_secret', '', time()-3600, '/');
     }
 
 
@@ -204,25 +223,21 @@ class ComAllPlayersHelper {
         
     }
 
-    //TODO: Move to helpers
+
     public function initLogin(){
         $app = JFactory::getApplication();
         $uri = JFactory::getURI();
-        $uriInstance = JURI::getInstance( $uri->toString() );
-
-        $this->db->setQuery('SELECT * FROM #__allplayers_auth');
-        $consumer = $this->db->loadObject();
-        
+ 
         if (function_exists('curl_init')) {
-            $client = new Client($consumer->oauthurl . '/oauth', array(
-                 'curl.CURLOPT_SSL_VERIFYPEER' => isset($consumer->verifypeer) ? $consumer->verifypeer : TRUE,
+            $client = new Client($this->consumer->oauthurl . '/oauth', array(
+                 'curl.CURLOPT_SSL_VERIFYPEER' => isset($this->consumer->verifypeer) ? $this->consumer->verifypeer : TRUE,
                  'curl.CURLOPT_CAINFO' =>  $this->libspath.'assets'.DS.'mozilla.pem',
                  'curl.CURLOPT_FOLLOWLOCATION' => FALSE,
             ));
 
             $oauth = new OauthPlugin(array(
-                'consumer_key' => $consumer->key,
-                'consumer_secret' => $consumer->secret,
+                'consumer_key' => $this->consumer->key,
+                'consumer_secret' => $this->consumer->secret,
                 'token' => FALSE,
                 'token_secret' => FALSE,
             ));
@@ -241,12 +256,18 @@ class ComAllPlayersHelper {
            
             $authorize = '/oauth/authorize?oauth_token=' . $oauth_tokens['oauth_token'];
             $authorize .= '&oauth_callback=' . urlencode($uri->toString().'&task=callback');
- 
-            $app->redirect($consumer->oauthurl . $authorize, null, null, true, true);
+
+            $app->redirect($this->consumer->oauthurl . $authorize, null, null, true, true);
+        } else {
+            error_log("Curl (or php5-curl) required but is not installed.");
         }
         return false;
     }
 
+    public function logout(){
+        setcookie('user_apid', '', time()-3600, '/');
+        $this->session->destroy();
+    }
 }
 
 ?>

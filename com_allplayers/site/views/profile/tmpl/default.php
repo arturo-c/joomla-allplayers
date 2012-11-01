@@ -19,8 +19,18 @@ if ($this->userLoggedIn){
 	<p>Email: <?php echo $user->email;?></p>
 	<p>Gender: <?php echo $user->gender;?></p>
 	<p>Nickname: <?php echo $user->nickname; ?></p>
-	<p><a href="<?php echo $user->profile_url;?>" target="_blank">Profile Link</a></p>
+	<p><a href="<?php echo $user->profile_url;?>/edit/profile" class="edit-profile" rel="{handler: 'iframe', size: {x: 1000, y: 700}}">Edit Profile</a></p>
+
+<script>
+	$(function(){
+
+	});
+</script>
 <?php } else {?>
-	Please login to view your profile.
-	<a href="index.php?option=com_allplayers&controller=profile" class="allplayers-login">Login</a>
+	<div>
+		<p>
+			Please login to view your profile.
+			<a href="index.php?option=com_allplayers&view=profile" class="allplayers-login">Login</a>
+		</p>
+	</div>
 <?php } ?>

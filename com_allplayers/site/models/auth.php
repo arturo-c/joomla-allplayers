@@ -8,7 +8,6 @@ class allplayersModelauth extends JModel {
 
 	public function __construct(){
 		parent::__construct();
-		error_log('auth ctor!');
 		$this->consumer = new allplayersModelconsumer();
 	}
 

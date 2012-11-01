@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset>
+		<field name="key" type="text" label="COM_ALLPLAYERS_AUTH_FIELD_KEY_LABEL"
+			description="COM_ALLPLAYERS_AUTH_FIELD_KEY_DESC" class="inputbox" size="35"
+			required="true" />
+
+		<field name="secret" type="text" label="COM_ALLPLAYERS_AUTH_FIELD_SECRET_LABEL"
+			description="COM_ALLPLAYERS_AUTH_FIELD_SECRET_DESC" class="inputbox" size="35"
+			required="true" />
+
+		<field name="oauthurl" type="text" label="COM_ALLPLAYERS_AUTH_FIELD_OAUTHURL_LABEL"
+			description="COM_ALLPLAYERS_AUTH_FIELD_OAUTHURL_DESC" class="inputbox" size="40"
+			required="true" />
+
+		<field name="verifypeer" type="checkbox" label="COM_ALLPLAYERS_AUTH_FIELD_VERIFYPEER_LABEL"
+			description="COM_ALLPLAYERS_AUTH_FIELD_VERIFYPEER_DESC" class="checkbox"
+			required="true" />
+	</fieldset>
+</form>

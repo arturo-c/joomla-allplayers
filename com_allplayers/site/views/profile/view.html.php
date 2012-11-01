@@ -50,6 +50,12 @@ class allplayersViewprofile extends Jview{
         	$this->assign('userLoggedIn', false);
         } else {
 	        $verifypeer = $consumer->verifypeer;
+	        if (!isset($_COOKIE['user_apid'])){
+	        	$userInfo = $this->helper->getCredentials();
+	        	$userId = $userInfo->apid;
+	        } else {
+	        	$userId = $_COOKIE['user_apid'];
+	        }
 
 	        $client = AllPlayersClient::factory(array(
 	            'auth' => 'oauth',
@@ -64,10 +70,10 @@ class allplayersViewprofile extends Jview{
 	            'curl.CURLOPT_CAINFO' => $this->libspath.'/assets/mozilla.pem',
 	            'curl.CURLOPT_FOLLOWLOCATION' => FALSE
 	        ));
-	        $response = $client->get('users/'.$_COOKIE['user_apid'].'.json')->send();
+	        $response = $client->get('users/'.$userId.'.json')->send();
 	       
 	        $user = json_decode($response->getBody(TRUE));
-
+	    	
 	        if (!isset($user)){
 	        	error_log("Error: Could not load user profile!");
 	            $this->_subject->setError('Could not load user profile.');

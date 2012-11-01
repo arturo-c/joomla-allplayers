@@ -29,6 +29,8 @@ class AllPlayersControllerAuth extends JController {
         $helper = new ComAllPlayersHelper();
         return $this->logUserIn($helper->getCredentials());
     }
+
+    
     private function logUserIn($userInfo){
         $app = JFactory::getApplication();
         // Get the log in credentials.
@@ -64,26 +66,26 @@ class AllPlayersControllerAuth extends JController {
 
                 $userInfo = $helper->doLogin($oauth_token, $secret);
             } catch (Exception $e) {
-                error_log("Exception (auth callback): ". $e->getMessage());
+                error_log("Exception (auth->callback): ". $e->getMessage());
                 $app->redirect(JRoute::_('index.php'), "Error: ". $e->getMessage());
             }
 
             if ($userInfo) {
-                 if ($mapping = $helper->getUserMapping($userInfo->apid)) {
-                    error_log("\n\nMapping good!");
+                if ($mapping = $helper->getUserMapping($userInfo->apid)) {
+
                      // log in user  
                      // For login we are using an authentication plugin.
                     if (true == $this->logUserIn($userInfo)){
-             
-                        $app->redirect(JRoute::_('index.php?option=com_allplayers&controller=auth&task=close'));
+                        $app->redirect(JRoute::_('index.php?option=com_allplayers&view=auth&task=close'));
                     } else {
-                        $app->redirect(JRoute::_('index.php?option=com_allplayers&controller=auth'), "Mapping set but could not login.");
+                        $app->redirect(JRoute::_('index.php?option=com_allplayers&view=auth'), "Mapping set but could not login.");
                     }
-                 } else {
+                } else {
+                    error_log("No mappings.");
                     //There is no mapping lets do some mappings!
-                    $app->redirect(JRoute::_('index.php?option=com_allplayers&controller=auth&view=mapping&task=mapping'));
-                 }
-             } 
+                    $app->redirect(JRoute::_('index.php?option=com_allplayers&view=auth&view=mapping&task=mapping'));
+                }
+            } 
         } else {
             $helper->clearCookies();
             $this->setRedirect($baseurl, 'No Auth Token is set.');
@@ -106,12 +108,12 @@ class AllPlayersControllerAuth extends JController {
             }
 
             $this->logUserIn($apUser);
-            $app->redirect(JRoute::_('index.php?option=com_allplayers&controller=auth&task=close'));
+            $app->redirect(JRoute::_('index.php?option=com_allplayers&view=auth&task=close'));
         } else {
 
             $createdUser = $this->createUser($credentials->user);
             //Close window after create.
-            $app->redirect(JRoute::_('index.php?option=com_allplayers&controller=auth&task=close'));
+            $app->redirect(JRoute::_('index.php?option=com_allplayers&view=auth&task=close'));
         }
     }
 
@@ -124,7 +126,7 @@ class AllPlayersControllerAuth extends JController {
             $params = JComponentHelper::getParams('com_users');
 
             $this->data->apid = $userInfo->apid;
-            $this->data->name = $userInfo->nickname;
+            $this->data->name = $userInfo->username;
             $this->data->username = $userInfo->email;
             $this->data->email = $userInfo->email;
 

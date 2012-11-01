@@ -1,30 +1,55 @@
 <?php
 /**
- * @version	0.1
- * @package	allplayers
- * @author Zach Curtis, Wayin Inc
-*
- * @author mail	info@wayin.com
- * @copyright	Copyright (C) 2012 Wayin.com - All rights reserved.
- * @license		GNU/GPL
+ * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @license		GNU General Public License version 2 or later; see LICENSE.txt
  */
- 
-// no direct access
-defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.controller');
+defined('_JEXEC') or die;
 
-class allplayersController extends JController
+/**
+ * Component Controller
+ *
+ * @package		Joomla.Administrator
+ * @subpackage	com_content
+ */
+class AllPlayersController extends JController
 {
+	/**
+	 * @var		string	The default view.
+	 * @since	1.6
+	 */
+	protected $default_view = 'allplayers';
 
-	function __construct() {
-		parent::__construct();
-    	$this->db = JFactory::getDBO();
-	}
-	
-	function display($cachable = false, $urlparams = false)
+	/**
+	 * Method to display a view.
+	 *
+	 * @param	boolean			If true, the view output will be cached
+	 * @param	array			An array of safe url parameters and their variable types, for valid values see {@link JFilterInput::clean()}.
+	 *
+	 * @return	JController		This object to support chaining.
+	 * @since	1.5
+	 */
+	public function display($cachable = false, $urlparams = false)
 	{
-		parent::display($cachable, $urlparams);
-	}
+		// Load the submenu.
+		//ContentHelper::addSubmenu(JRequest::getCmd('view', 'default'));
 
+		$view		= JRequest::getCmd('view', 'default');
+		$layout 	= JRequest::getCmd('layout', 'default');
+		$id			= JRequest::getInt('id');
+
+		// Check for edit form.
+		if ($view == 'auth' && $layout == 'edit' && !$this->checkEditId('com_allplayers.edit.auth', $id)) {
+			// Somehow the person just went to the form - we don't allow that.
+			$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_UNHELD_ID', $id));
+			$this->setMessage($this->getError(), 'error');
+			$this->setRedirect(JRoute::_('index.php?option=com_allplayers&view=default', false));
+
+			return false;
+		}
+
+		parent::display();
+
+		return $this;
+	}
 }

@@ -2,6 +2,20 @@
 	background:url('../images/allplayers-logo.png') no-repeat;
 }
 
+.loader {
+	display:inline-block;
+	margin:20px;
+	line-height: 32px;
+	vertical-align: top;
+	font-size:115%;
+}
+.loader .icon{
+	background:url('../images/ajax-loader.gif') no-repeat;
+	display:inline-block;
+	height:32px;
+	width:32px;
+	
+}
 form input[type="text"]{
 	min-width:200px;
 }

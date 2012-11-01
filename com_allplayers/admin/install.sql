@@ -13,3 +13,14 @@ CREATE TABLE #__allplayers_auth_mapping (
   `allplayersid` VARCHAR( 200 ) NOT NULL UNIQUE,
   `userid` INT NOT NULL UNIQUE
 ) ENGINE = InnoDB;
+
+
+DROP TABLE IF EXISTS #__allplayers_profile;
+CREATE TABLE #__allplayers_profile (
+  `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT ,
+  `group` VARCHAR( 50 ) NOT NULL ,
+  `values` TEXT NOT NULL
+) ENGINE = InnoDB;
+
+
+

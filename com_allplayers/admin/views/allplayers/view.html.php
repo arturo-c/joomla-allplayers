@@ -18,7 +18,6 @@ class allplayersViewallplayers extends Jview
 
     function __construct() {
         parent::__construct();
-       // $this->db = JFactory::getDBO();
     }
     
     function display($tpl = null) {
@@ -28,8 +27,13 @@ class allplayersViewallplayers extends Jview
         parent::display($tpl);
     }
 
+    function save(){
+        error_log("\n\nDefault view save!!!\n");
+    }
     function addToolbar(){
         JToolBarHelper::title( 'All-Players', 'allplayers-logo.png' );
+        JToolBarHelper::save('allplayers.save');
+        JToolBarHelper::cancel('allplayers.cancel');
     }
     
 }
