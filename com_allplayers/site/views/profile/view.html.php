@@ -79,6 +79,8 @@ class allplayersViewprofile extends Jview{
 	            $this->_subject->setError('Could not load user profile.');
 	            return false;
 	        }
+
+	        //$response = $client->get('users/'.$userId.'/events.json')->send();
         	$this->assign('userLoggedIn', true);
         	$this->assign('user', $user);
     	}

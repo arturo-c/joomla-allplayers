@@ -2,9 +2,9 @@
 defined('_JEXEC') or die('Restricted Access');
 ?>
 <span class="mod_allplayers_profile <?php echo $modClassSuffix;?>">
-	<?php if ($isLoggedIn){ ?>, 
+	<?php if ($isLoggedIn){ ?>
 		Welcome, <a href="index.php?option=com_allplayers&view=profile"><?php echo $linkText; ?></a>&nbsp;
-		(<a href="index.php?option=com_allplayers&view=auth&task=logout">Logout</a>)
+		(<a href="index.php?option=com_allplayers&task=auth.logout">Logout</a>)
 	<?php } else { ?>
 		<a href="index.php?option=com_allplayers&view=profile" class="login"><?php echo $linkText; ?></a>
 		<script>

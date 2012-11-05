@@ -10,12 +10,10 @@ defined('_JEXEC') or die;
  * Component Controller
  *
  * @package		Joomla.Administrator
- * @subpackage	com_content
+ * @subpackage	com_allplayers
  */
 
 jimport('joomla.application.component.controller');
-
-include_once(JPATH_BASE . DS."components".DS."com_allplayers".DS."helper.php");
 
 class AllPlayersController extends JController
 {
@@ -31,22 +29,9 @@ class AllPlayersController extends JController
 	 */
 	public function display($cachable = false, $urlparams = false)
 	{
-		// Load the submenu.
-		//ContentHelper::addSubmenu(JRequest::getCmd('view', 'default'));
-
-		$view		= JRequest::getCmd('view', 'default');
-		$layout 	= JRequest::getCmd('layout', 'default');
-		$id			= JRequest::getInt('id');
-
-		parent::display();
+		parent::display($cachable, $urlparams);
 
 		return $this;
 	}
 
-	public function logout(){
-        $helper = new ComAllPlayersHelper();
-        $app = JFactory::getApplication();
-        $helper->logout();
-        $app->redirect('index.php');
-    }
 }

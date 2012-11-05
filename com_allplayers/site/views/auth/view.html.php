@@ -23,35 +23,49 @@ include_once(JPATH_BASE . DS."components".DS."com_allplayers".DS."helper.php");
 
 class allplayersViewauth extends Jview{
 
-	function __construct(){
-		parent::__construct();
+	public function __construct($config = array()){
+		parent::__construct($config);
+        $this->_skipCheck = $skip_check;
+
 	}
 	
 	public function display($tpl = null) {
-        $helper = new ComAllPlayersHelper();
-        $app = JFactory::getApplication();
-        $apUser = $helper->getCredentials();
-        $jUser = $helper->getJoomlaAllPlayersUser();
-        
-        if (!$apUser){
-        	$helper->initLogin();
-        }
-     
-        if (isset($apUser)){
-            //no mapped user, check for joomla user.
-            if ($jUser){
-                $existingJUser = $helper->mapExistingJoomlaUser($apUser->email);
-            } else {
-                $app->redirect(JRoute::_('index.php?option=com_allplayers&controller=auth&view=mapping&task=mapping'));
-            }
-        	
-			$this->assign('userLoggedIn', true);
-        	parent::display($tbl);
-        //I do not have a joomla user
+        error_log("\nskip check: ". $this->_skipCheck);
+        if ($this->_skipCheck){
+            $this->assign('userLoggedIn', true);
         } else {
-        	//$app->redirect(JRoute::_('index.php?option=com_allplayers&controller=auth&view=mapping&task=mapping'));
+
+            $helper = new ComAllPlayersHelper();
+            $app = JFactory::getApplication();
+            $apUser = $helper->getCredentials();
+            $jUser = $helper->getJoomlaAllPlayersUser();
+              error_log('AP USER: '. $apUser);
+            if (!$apUser){
+                
+                $helper->initLogin();
+            }
+         
+            if (isset($apUser)){
+                //no mapped user, check for joomla user.
+                if ($jUser){
+                    $existingJUser = $helper->mapExistingJoomlaUser($apUser->email);
+                } else {
+                    $app->redirect(JRoute::_('index.php?option=com_allplayers&task=auth.mapping'));
+                }
+                
+                $this->assign('userLoggedIn', true);
+            //I do not have a joomla user
+            } else {
+                //$app->redirect(JRoute::_('index.php?option=com_allplayers&controller=auth&view=mapping&task=mapping'));
+            }
         }
+       
 	    parent::display($tbl);
 	}
-	
+
+    public function closeWindow(){
+         $this->assign('userLoggedIn', true);
+        parent::display($tbl);
+    }
+
 }

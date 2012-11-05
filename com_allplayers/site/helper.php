@@ -72,24 +72,7 @@ class ComAllPlayersHelper {
         $this->db->setQuery($query);
         $user = $this->db->loadObject();
     } 
-    // if (!isset($user)){
 
-    //     $apUser = $this->getCredentials();
-    //     error_log('getJoomlaAllPlayersUser: user not set. '. isset($user));
-    //     if ($apUser != null){
-    //         $query = 'SELECT * FROM #__users u WHERE u.username = "'.$apUser->email.'"';
-    //         $this->db->setQuery($query);
-    //         $jUser = $this->db->loadObject();
-    //         //We have a matching joomla user but no mapping. Mapit.
-    //         if (isset($jUser)){
-    //             $mapping = $this->setUserMapping($apUser, $jUser->id);
-    //             if (isset($mapping)){
-    //                error_log('got mapping: '.$mapping);
-    //                $user = $this->getJoomlaAllPlayersUser($apUser->apid);
-    //             }
-    //         }
-    //     }
-    // }
     return $user;
   }
 
@@ -255,7 +238,7 @@ class ComAllPlayersHelper {
             $this->session->set('access_secret', $oauth_tokens['oauth_token_secret']);
            
             $authorize = '/oauth/authorize?oauth_token=' . $oauth_tokens['oauth_token'];
-            $authorize .= '&oauth_callback=' . urlencode($uri->toString().'&task=callback');
+            $authorize .= '&oauth_callback=' . urlencode($uri->toString().'&task=auth.callback');
 
             $app->redirect($this->consumer->oauthurl . $authorize, null, null, true, true);
         } else {
@@ -265,6 +248,7 @@ class ComAllPlayersHelper {
     }
 
     public function logout(){
+        $this->clearCookies();
         setcookie('user_apid', '', time()-3600, '/');
         $this->session->destroy();
     }

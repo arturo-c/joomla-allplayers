@@ -10,7 +10,7 @@ defined('_JEXEC') or die;
  * Component Controller
  *
  * @package		Joomla.Administrator
- * @subpackage	com_content
+ * @subpackage	com_allplayers
  */
 class AllPlayersController extends JController
 {

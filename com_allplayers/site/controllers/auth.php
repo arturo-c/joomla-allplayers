@@ -11,10 +11,10 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.controller');
-include_once(JPATH_BASE . DS."components".DS."com_allplayers".DS."helper.php");
+jimport('joomla.application.component.controllerform');
+include_once(JPATH_COMPONENT.DS."helper.php");
 
-class AllPlayersControllerAuth extends JController {
+class AllPlayersControllerAuth extends JControllerForm {
     protected $data;
 
     function __construct() {
@@ -25,9 +25,14 @@ class AllPlayersControllerAuth extends JController {
         $this->db = JFactory::getDBO();
         $this->session = JFactory::getSession();
     }
+
     public function login(){
         $helper = new ComAllPlayersHelper();
-        return $this->logUserIn($helper->getCredentials());
+        $userInfo = $helper->getCredentials();
+        if (!isset($_COOKIE['user_apid'])){
+            setcookie('user_apid', $userInfo->apid, time()+60*60*24*30*3, '/');
+        }
+        return $this->logUserIn($userInfo);
     }
 
     
@@ -42,6 +47,13 @@ class AllPlayersControllerAuth extends JController {
         return $app->login($credentials);
     }
     
+    public function logout(){
+        $helper = new ComAllPlayersHelper();
+        $app = JFactory::getApplication();
+        $helper->logout();
+        $app->redirect('index.php');
+    }
+
     public function display($cachable = false, $urlparams = false) {
         parent::display($cachable, $urlparams);
     }
@@ -49,7 +61,7 @@ class AllPlayersControllerAuth extends JController {
     public function close(){
         require_once (JPATH_COMPONENT.DS.'views'.DS.'auth'.DS.'view.html.php');
         $view = new allplayersViewauth();
-        $view->display();
+        $view->closeWindow();
        
     }
 
@@ -76,14 +88,16 @@ class AllPlayersControllerAuth extends JController {
                      // log in user  
                      // For login we are using an authentication plugin.
                     if (true == $this->logUserIn($userInfo)){
-                        $app->redirect(JRoute::_('index.php?option=com_allplayers&view=auth&task=close'));
+                        $app->redirect(JRoute::_('index.php?option=com_allplayers&task=auth.close'));
                     } else {
-                        $app->redirect(JRoute::_('index.php?option=com_allplayers&view=auth'), "Mapping set but could not login.");
+                        //Mapping is good but we could not login.  The account must be disabled.
+                        $helper->logout();
+                        $app->redirect(JRoute::_('index.php?option=com_allplayers&task=auth.close'), "Your account is disabled. Please contact customer service");
                     }
                 } else {
                     error_log("No mappings.");
                     //There is no mapping lets do some mappings!
-                    $app->redirect(JRoute::_('index.php?option=com_allplayers&view=auth&view=mapping&task=mapping'));
+                    $app->redirect(JRoute::_('index.php?option=com_allplayers&task=auth.mapping'));
                 }
             } 
         } else {
@@ -93,7 +107,6 @@ class AllPlayersControllerAuth extends JController {
     }
 
     public function mapping() {
-
         $helper = new ComAllPlayersHelper();
         $app = JFactory::getApplication();
         $jUser = $helper->getJoomlaAllPlayersUser();
@@ -108,12 +121,12 @@ class AllPlayersControllerAuth extends JController {
             }
 
             $this->logUserIn($apUser);
-            $app->redirect(JRoute::_('index.php?option=com_allplayers&view=auth&task=close'));
+            $app->redirect(JRoute::_('index.php?option=com_allplayers&task=auth.close'));
         } else {
 
             $createdUser = $this->createUser($credentials->user);
             //Close window after create.
-            $app->redirect(JRoute::_('index.php?option=com_allplayers&view=auth&task=close'));
+            $app->redirect(JRoute::_('index.php?option=com_allplayers&task=auth.close'));
         }
     }
 

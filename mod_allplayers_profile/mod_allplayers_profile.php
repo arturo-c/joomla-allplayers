@@ -8,7 +8,8 @@ $isLoggedIn = false;
 
 if (isset($_COOKIE['user_apid'])){
 	$apUser = $helper->getCredentials();
-	if (isset($apUser)){
+	
+	if (isset($apUser) && $apUser){
 		$linkText = "$apUser->username";
 		$isLoggedIn = true; 
 	}
